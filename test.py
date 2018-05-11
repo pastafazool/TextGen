@@ -1,6 +1,11 @@
 import tensorflow as tf
 import numpy as np
 import keras
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import Dropout
+from keras.layers import LSTM
+from keras.callbacks import ModelCheckpoint
 
 import os, glob
 import nltk
@@ -16,9 +21,10 @@ encoder = preprocessing.LabelEncoder()
 
 
 class TextFile(object):
-    def __init__(self, filename, traintextlength):
+    def __init__(self, filename, traintextlength, lstmsize, ):
         self.filename = filename
         self.traintextlength = traintextlength
+        self.lstmsize = lstmsize
 
     def tokenize(self):
         with open(self.filename, 'r') as sentencedata:
@@ -61,20 +67,28 @@ class TextFile(object):
 
         return lstm_input, lstm_output, training_data_size
 
+
+    def lstm_cell(self):
+        print("Generate LSTM Cell")
+
+
     def run_lstm(self):
         X, Y, input_datasize = self.onehotencode()
-        #X = np.reshape(X, (input_datasize, self.traintextlength, 1))
-        X = np.reshape(X, (input_datasize, self.traintextlength))
+        X = np.reshape(X, (input_datasize, self.traintextlength, 1))
+
         X = X / float(input_datasize)
+        Y = keras.utils.to_categorical(Y)
         print(X)
-        print("---")
+        print(Y)
+        print("------------------Running LSTM-------------------------")
 
-def main():
-    print("Shakespeare TextGen");
-    hello = TextFile("hello.txt", 15);
-    #hello.tokenize()
-    hello.onehotencode()
-    hello.run_lstm()
+        model = Sequential()
+        model.add(LSTM(self.lstmsize, input_shape=(X.shape[1], X.shape[2])))
+        model.add(Dropout(0.2))
+        model.add(Dense(Y.shape[1], activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam')
+        base = "models/"
 
-if __name__ == '__main__':
-    main()
+        filepath = base + "model-{epoch:02d}-{loss:.4f}.hdf5"
+        checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=False, mode='min')
+        model.fit(X, Y, epochs=100, batch_size=64, callbacks=[checkpoint])
