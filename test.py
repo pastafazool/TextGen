@@ -1,4 +1,5 @@
 import tensorflow as tf
+from time import time
 import numpy as np
 import keras
 from keras.models import Sequential
@@ -6,6 +7,7 @@ from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
+from keras.callbacks import TensorBoard
 
 import os, glob
 import nltk
@@ -21,10 +23,11 @@ encoder = preprocessing.LabelEncoder()
 
 
 class TextFile(object):
-    def __init__(self, filename, traintextlength, lstmsize, ):
+    def __init__(self, filename, traintextlength, lstmsize, dropout):
         self.filename = filename
         self.traintextlength = traintextlength
         self.lstmsize = lstmsize
+        self.dropout = dropout
 
     def tokenize(self):
         with open(self.filename, 'r') as sentencedata:
@@ -68,9 +71,10 @@ class TextFile(object):
         return lstm_input, lstm_output, training_data_size
 
 
-    def lstm_cell(self):
-        print("Generate LSTM Cell")
-
+#    def lstm_cell(self, modelsize, model):
+#        print("Generate LSTM Cell")
+#        for i in range(modelsize):
+    #        model.add(LSTM(self.lstmsize, input_shape=())
 
     def run_lstm(self):
         X, Y, input_datasize = self.onehotencode()
@@ -84,11 +88,13 @@ class TextFile(object):
 
         model = Sequential()
         model.add(LSTM(self.lstmsize, input_shape=(X.shape[1], X.shape[2])))
-        model.add(Dropout(0.2))
+        model.add(Dropout(self.dropout))
         model.add(Dense(Y.shape[1], activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam')
-        base = "models/"
+        tensorboard = TensorBoard(log_dir="logs/{}", histogram_freq=0, batch_size=32, write_graph=False, write_grads=False, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
 
+
+        base = "models/"
         filepath = base + "model-{epoch:02d}-{loss:.4f}.hdf5"
         checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=False, mode='min')
-        model.fit(X, Y, epochs=100, batch_size=64, callbacks=[checkpoint])
+        model.fit(X, Y, epochs=100, batch_size=64, callbacks=[checkpoint, tensorboard])

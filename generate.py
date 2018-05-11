@@ -12,13 +12,5 @@ import nltk
 
 from sklearn import preprocessing
 
-import test
-
-
-def main():
-    print("Shakespeare TextGen");
-    hello = test.TextFile("hello.txt", 30, 512, 0.15);
-    hello.run_lstm()
-
-if __name__ == '__main__':
-    main()
+textchars = sorted(list(set(sentence)))
+int_to_char = dict((i, c) for i, c in enumerate(chars))
