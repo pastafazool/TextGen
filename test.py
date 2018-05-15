@@ -11,6 +11,7 @@ from keras.callbacks import TensorBoard
 
 import os, glob
 import nltk
+import sys
 
 from sklearn import preprocessing
 
@@ -70,12 +71,6 @@ class TextFile(object):
 
         return lstm_input, lstm_output, training_data_size
 
-
-#    def lstm_cell(self, modelsize, model):
-#        print("Generate LSTM Cell")
-#        for i in range(modelsize):
-    #        model.add(LSTM(self.lstmsize, input_shape=())
-
     def run_lstm(self):
         X, Y, input_datasize = self.onehotencode()
         X = np.reshape(X, (input_datasize, self.traintextlength, 1))
@@ -87,7 +82,12 @@ class TextFile(object):
         print("------------------Running LSTM-------------------------")
 
         model = Sequential()
-        model.add(LSTM(self.lstmsize, input_shape=(X.shape[1], X.shape[2])))
+        model.add(LSTM(self.lstmsize, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
+        model.add(LSTM(self.lstmsize, return_sequences=True))
+        model.add(LSTM(self.lstmsize, return_sequences=True))
+        model.add(LSTM(self.lstmsize, return_sequences=True))
+        model.add(LSTM(self.lstmsize))
+
         model.add(Dropout(self.dropout))
         model.add(Dense(Y.shape[1], activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam')
@@ -98,3 +98,69 @@ class TextFile(object):
         filepath = base + "model-{epoch:02d}-{loss:.4f}.hdf5"
         checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=False, mode='min')
         model.fit(X, Y, epochs=100, batch_size=64, callbacks=[checkpoint, tensorboard])
+
+    def generate_text(self, modelfile):
+
+        with open(self.filename, 'r') as sentencedata:
+            text_gensentence = sentencedata.read()
+            text_gensentence = text_gensentence.lower()
+
+        textlength = len(text_gensentence)
+        chars_gensentence = sorted(list(set(text_gensentence)))
+        textcharinteger = dict((c, i) for i, c in enumerate(chars_gensentence))
+        textintegerchar = dict((i, c) for i, c in enumerate(chars_gensentence))
+
+        characters = len(chars_gensentence)
+
+        xhatorig = []
+        yhat = []
+
+        for i in range(0, textlength - self.traintextlength, 1):
+            seq_in = text_gensentence[i:i + self.traintextlength]
+            seq_out = text_gensentence[i + self.traintextlength]
+            xhatorig.append([textcharinteger[char] for char in seq_in])
+            yhat.append(textcharinteger[seq_out])
+        length_number = len(xhatorig)
+
+        xhat = np.reshape(xhatorig, (length_number, self.traintextlength, 1))
+        xhat = xhat / float(characters)
+        yhat = keras.utils.to_categorical(yhat)
+
+        reload = Sequential()
+        reload.add(LSTM(self.lstmsize, return_sequences=True, input_shape=(xhat.shape[1], xhat.shape[2])))
+        reload.add(LSTM(self.lstmsize, return_sequences=True))
+        reload.add(LSTM(self.lstmsize, return_sequences=True))
+        reload.add(LSTM(self.lstmsize, return_sequences=True))
+        reload.add(LSTM(self.lstmsize))
+
+        reload.add(Dropout(0))
+        reload.add(Dense(yhat.shape[1], activation='softmax'))
+
+        reload.load_weights(modelfile)
+
+        reload.compile(loss='categorical_crossentropy', optimizer='adam')
+
+        gen = np.random.randint(0, len(xhatorig)-1)
+        pattern = xhatorig[gen]
+        display = ""
+        # generate characters
+        for i in range(1000):
+            xhatpred = np.reshape(pattern, (1, len(pattern), 1))
+            xhatpred = xhatpred / float(characters)
+            prediction = reload.predict(xhatpred)
+            index = np.argmax(prediction)
+            result = textintegerchar[index]
+            #print(result)
+            seq_in = [textintegerchar[value] for value in pattern]
+
+            #sys.stdout.write(result)
+            display = display + result
+            pattern.append(index)
+            pattern = pattern[1:len(pattern)]
+
+            file = open("output.txt", "w")
+
+        file.write(display)
+        file.close()
+
+        print(display)

@@ -6,11 +6,20 @@ from keras.layers import Dense
 from keras.layers import Dropout
 from keras.layers import LSTM
 from keras.callbacks import ModelCheckpoint
+import sys
 
 import os, glob
 import nltk
 
 from sklearn import preprocessing
+import test
 
-textchars = sorted(list(set(sentence)))
-int_to_char = dict((i, c) for i, c in enumerate(chars))
+import test
+
+def main():
+    print("Shakespeare TextGen");
+    hello = test.TextFile("hello.txt", 30, 512, 0);
+    hello.generate_text("models/model-02-2.9677.hdf5");
+
+if __name__ == '__main__':
+    main()
