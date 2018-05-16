@@ -10,10 +10,18 @@ from keras.callbacks import ModelCheckpoint
 import os, glob
 import nltk
 
-from sklearn import preprocessing
-
 import test
 
+import tensorflow as tf
+import keras.backend.tensorflow_backend as KTF
+
+def get_session(gpu_fraction=0.666):
+    """Assume that you have 6GB of GPU memory and want to allocate ~2GB"""
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction)
+    return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+
+
+KTF.set_session(get_session())
 
 def main():
     print("Shakespeare TextGen");
