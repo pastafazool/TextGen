@@ -83,9 +83,13 @@ class TextFile(object):
 
         model = Sequential()
         model.add(LSTM(self.lstmsize, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
+        model.add(Dropout(self.dropout))
         model.add(LSTM(self.lstmsize, return_sequences=True))
+        model.add(Dropout(self.dropout))
         model.add(LSTM(self.lstmsize, return_sequences=True))
+        model.add(Dropout(self.dropout))
         model.add(LSTM(self.lstmsize, return_sequences=True))
+        model.add(Dropout(self.dropout))
         model.add(LSTM(self.lstmsize))
 
         model.add(Dropout(self.dropout))
@@ -128,12 +132,16 @@ class TextFile(object):
 
         reload = Sequential()
         reload.add(LSTM(self.lstmsize, return_sequences=True, input_shape=(xhat.shape[1], xhat.shape[2])))
+        reload.add(Dropout(self.dropout))
         reload.add(LSTM(self.lstmsize, return_sequences=True))
+        reload.add(Dropout(self.dropout))
         reload.add(LSTM(self.lstmsize, return_sequences=True))
+        reload.add(Dropout(self.dropout))
         reload.add(LSTM(self.lstmsize, return_sequences=True))
+        reload.add(Dropout(self.dropout))
         reload.add(LSTM(self.lstmsize))
 
-        reload.add(Dropout(0))
+        reload.add(Dropout(self.lstmsize))
         reload.add(Dense(yhat.shape[1], activation='softmax'))
 
         reload.load_weights(modelfile)
@@ -144,23 +152,18 @@ class TextFile(object):
         pattern = xhatorig[gen]
         display = ""
         # generate characters
-        for i in range(1000):
+        print(textintegerchar)
+        for i in range(100):
             xhatpred = np.reshape(pattern, (1, len(pattern), 1))
             xhatpred = xhatpred / float(characters)
             prediction = reload.predict(xhatpred)
+            print(prediction)
             index = np.argmax(prediction)
+            print(index)
             result = textintegerchar[index]
-            #print(result)
             seq_in = [textintegerchar[value] for value in pattern]
-
-            #sys.stdout.write(result)
-            display = display + result
             pattern.append(index)
             pattern = pattern[1:len(pattern)]
-
-            file = open("output.txt", "w")
-
-        file.write(display)
-        file.close()
+            display = display + str(result)
 
         print(display)

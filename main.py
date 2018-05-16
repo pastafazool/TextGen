@@ -17,7 +17,7 @@ import test
 
 def main():
     print("Shakespeare TextGen");
-    hello = test.TextFile("hello.txt", 30, 512, 0.15);
+    hello = test.TextFile("hello.txt", 30, 512, 0.6);
     hello.run_lstm()
 
 if __name__ == '__main__':
