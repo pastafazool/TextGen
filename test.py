@@ -33,7 +33,6 @@ class TextFile(object):
     def tokenize(self):
         with open(self.filename, 'r') as sentencedata:
             sentence = sentencedata.read()
-            print(sentence)
         sentence = str(sentence).lower()
         tokenize = nltk.word_tokenize(sentence)
         textpos = nltk.pos_tag(tokenize)
@@ -99,9 +98,10 @@ class TextFile(object):
 
 
         base = "models/"
-        filepath = base + "model-{epoch:02d}-{loss:.4f}.hdf5"
+        filepath = base + "model.hdf5"
+        print(Y)
         checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=False, mode='min')
-        model.fit(X, Y, epochs=100, batch_size=64, callbacks=[checkpoint, tensorboard])
+        model.fit(X, Y, epochs=1000, batch_size=128, callbacks=[checkpoint, tensorboard])
 
     def generate_text(self, modelfile):
 

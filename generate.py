@@ -18,8 +18,8 @@ import test
 
 def main():
     print("Shakespeare TextGen");
-    hello = test.TextFile("hello.txt", 30, 512, 0);
-    hello.generate_text("models/model-21-2.9497.hdf5");
+    hello = test.TextFile("hello.txt", 5, 64, 0);
+    hello.generate_text("models/model.hdf5");
 
 if __name__ == '__main__':
     main()
