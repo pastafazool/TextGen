@@ -22,7 +22,7 @@ import test
 
 def main():
     print("Shakespeare TextGen");
-    hello = test.TextFile("hello.txt", 15, 128, 0);
+    hello = test.TextFile("hello.txt", 5, 16, 0);
     hello.generate_text("models/model.hdf5");
 
 if __name__ == '__main__':

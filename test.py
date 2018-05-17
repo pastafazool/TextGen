@@ -86,10 +86,6 @@ class TextFile(object):
         model.add(LSTM(self.lstmsize, return_sequences=True))
         model.add(Dropout(self.dropout))
         model.add(LSTM(self.lstmsize, return_sequences=True))
-        model.add(Dropout(self.dropout))
-        model.add(LSTM(self.lstmsize, return_sequences=True))
-        model.add(Dropout(self.dropout))
-        model.add(LSTM(self.lstmsize))
 
         model.add(Dropout(self.dropout))
         model.add(Dense(Y.shape[1], activation='softmax'))
@@ -136,11 +132,6 @@ class TextFile(object):
         reload.add(LSTM(self.lstmsize, return_sequences=True))
         reload.add(Dropout(self.dropout))
         reload.add(LSTM(self.lstmsize, return_sequences=True))
-        reload.add(Dropout(self.dropout))
-        reload.add(LSTM(self.lstmsize, return_sequences=True))
-        reload.add(Dropout(self.dropout))
-        reload.add(LSTM(self.lstmsize))
-
         reload.add(Dropout(self.lstmsize))
         reload.add(Dense(yhat.shape[1], activation='softmax'))
 
