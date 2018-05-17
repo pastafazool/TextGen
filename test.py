@@ -83,11 +83,9 @@ class TextFile(object):
         model = Sequential()
         model.add(LSTM(self.lstmsize, return_sequences=True, input_shape=(X.shape[1], X.shape[2])))
         model.add(Dropout(self.dropout))
-        model.add(LSTM(self.lstmsize, return_sequences=True))
-        model.add(Dropout(self.dropout))
         model.add(LSTM(self.lstmsize))
-
         model.add(Dropout(self.dropout))
+
         model.add(Dense(Y.shape[1], activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam')
         tensorboard = TensorBoard(log_dir="logs/{}", histogram_freq=0, batch_size=32, write_graph=False, write_grads=False, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
@@ -129,10 +127,8 @@ class TextFile(object):
         reload = Sequential()
         reload.add(LSTM(self.lstmsize, return_sequences=True, input_shape=(xhat.shape[1], xhat.shape[2])))
         reload.add(Dropout(self.dropout))
-        reload.add(LSTM(self.lstmsize, return_sequences=True))
-        reload.add(Dropout(self.dropout))
         reload.add(LSTM(self.lstmsize))
-        reload.add(Dropout(self.lstmsize))
+        reload.add(Dropout(self.dropout))
         reload.add(Dense(yhat.shape[1], activation='softmax'))
 
         reload.load_weights(modelfile)

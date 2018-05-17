@@ -25,7 +25,7 @@ KTF.set_session(get_session())
 
 def main():
     print("Shakespeare TextGen");
-    hello = test.TextFile("hello.txt", 5, 16, 0.6);
+    hello = test.TextFile("hello.txt", 10, 16, 0.2);
     hello.run_lstm()
 
 if __name__ == '__main__':
