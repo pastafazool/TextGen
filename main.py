@@ -24,7 +24,7 @@ def get_session(gpu_fraction=0.10):
 KTF.set_session(get_session())
 
 def main():
-    print("Shakespeare TextGen");
+    #print("Shakespeare TextGen");
     hello = test.TextFile("hello.txt", 10, 16, 0.2);
     hello.run_lstm()
 
