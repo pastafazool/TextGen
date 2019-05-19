@@ -95,7 +95,7 @@ class TextFile(object):
         filepath = base + "model.hdf5"
         print(Y)
         checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=1, save_best_only=False, mode='min')
-        model.fit(X, Y, epochs=1000, batch_size=128, callbacks=[checkpoint, tensorboard])
+        model.fit(X, Y, epochs=650, batch_size=128, callbacks=[checkpoint, tensorboard])
 
     def generate_text(self, modelfile):
 
